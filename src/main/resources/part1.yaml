@@ -1,0 +1,684 @@
+openapi: 3.0.3
+info:
+  title: Bookstore API
+  description: An API for an online bookkeeping system. Allows for tracking of orders, authors and books.
+  version: 1.0.0
+servers:
+  - url: 'localhost:8080/api'
+paths:
+  /authors:
+    get:
+      summary: Returns a list of authors
+      responses:
+        '200':
+          description: A JSON array of every author in the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      example: 1
+                    name:
+                      type: string
+                      example: "John Doe"
+                    birthyear:
+                      type: integer
+                      format: int64
+                      example: 2004
+                    nationality:
+                      type: string
+                      example: "Norwegian"
+                    books:
+                      type: array
+                      items:
+                        type: object
+        '204':
+          description: No authors, array is empty
+    post:
+      summary: Creates a new author
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jack"
+                birthyear:
+                  type: integer
+                  format: int64
+                  example: 2041
+                nationality:
+                  type: string
+                  example: "Martian"
+      responses:
+        '201':
+          description: Author succesfully created
+          headers:
+            Location:
+              description: Location of newly created author
+              schema:
+                type: string
+                format: url
+                example: "http://localhost:8080/api/authors/3"
+        '415':
+          description: Unsupported request body media type (JSON required)
+  /authors/{id}:
+    get:
+      summary: Returns an author by their ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target author
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A JSON object representing the author
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 2
+                  name:
+                    type: string
+                    example: "Jane Doe"
+                  birthyear:
+                    type: integer
+                    format: int64
+                    example: 2001
+                  nationality:
+                    type: string
+                    example: "English"
+                  books:
+                    type: array
+                    items:
+                      type: object
+        '404':
+          description: Author with specified ID does not exist
+    delete:
+      summary: Deletes author with specified ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target author
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Author with specified ID was deleted
+        '404':
+          description: Author with specified ID does not exist
+    put:
+      summary: Updates specified author
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target author
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Jill"
+                birthyear:
+                  type: integer
+                  format: int64
+                  example: 2066
+                nationality:
+                  type: string
+                  example: "Venusian"
+      responses:
+        '200':
+          description: Author was updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 4
+                  name:
+                    type: string
+                    example: "Jill"
+                  birthyear:
+                    type: integer
+                    format: int64
+                    example: 2066
+                  nationality:
+                    type: string
+                    example: "Venusian"
+        '404':
+          description: Author with specified ID does not exist
+  /authors/{id}/books:
+    get:
+      summary: Returns a list of all books by the author
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target author
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A JSON array of every book by the author
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    isbn:
+                      type: string
+                      example: "RT1121"
+                    title:
+                      type: string
+                      example: "Hello World 2"
+                    publicationYear:
+                      type: integer
+                      format: int64
+                      example: 2012
+                    price:
+                      type: number
+                      example: 29.99
+        '404':
+          description: Author with specified ID does not exist
+  /books:
+    get:
+      summary: Returns every book
+      responses:
+        '200':
+          description: A JSON array of every book
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    isbn:
+                      type: string
+                      example: "RT1121"
+                    title:
+                      type: string
+                      example: "Hello World 2"
+                    publicationYear:
+                      type: integer
+                      format: int64
+                      example: 2012
+                    price:
+                      type: number
+                      example: 29.99
+        '204':
+          description: No books, array is empty
+    post:
+      summary: Creates a new book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isbn:
+                  type: string
+                  example: "LK1521"
+                title:
+                  type: string
+                  example: "Hello World 3: Endgame"
+                publicationYear:
+                  type: integer
+                  format: int64
+                  example: 1943
+                price:
+                  type: number
+                  example: 59999.49
+      responses:
+        '201':
+          description: Book succesfully created
+          headers:
+            Location:
+              description: Location of newly created book
+              schema:
+                type: string
+                format: url
+                example: "http://localhost:8080/api/books/LK1521"
+        '415':
+          description: Unsupported request body media type (JSON required)
+        '409':
+          description: A book with the supplied ISBN already exists
+  /books/{isbn}:
+    get:
+      summary: Gets a book with specified ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object representing the book
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isbn:
+                    type: string
+                    example: "ZQ4418"
+                  title:
+                    type: string
+                    example: "Hello World 4: Unlocked"
+                  publicationYear:
+                    type: integer
+                    format: int64
+                    example: 1784
+                  price:
+                    type: number
+                    example: 61.49
+        '404':
+          description: Book with specified ISBN does not exist
+    delete:
+      summary: Deletes a book with the specified ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book with specified ISBN was deleted
+        '404':
+          description: Book with specified ISBN does not exist
+    put:
+      summary: Updates specified book
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isbn:
+                  type: string
+                  example : "KP2837"
+                title:
+                  type: string
+                  example: "Jakata Tales"
+                publicationYear:
+                  type: integer
+                  format: int64
+                  example: 2036
+                price:
+                  type: number
+                  example: 28499.49
+      responses:
+        '200':
+          description: Book was updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isbn:
+                    type: string
+                    example : "KP2837"
+                  title:
+                    type: string
+                    example: "Jakata Tales"
+                  publicationYear:
+                    type: integer
+                    format: int64
+                    example: 2036
+                  price:
+                    type: number
+                    example: 28499.49
+        '404':
+          description: Book with specified ISBN does not exist
+  /books/{isbn}/authors:
+    get:
+      summary: Gets a array of all the Authors of the book with specified ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object representing all the authors of the book
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Jake"
+                    birthyear:
+                      type: integer
+                      format: int64
+                      example: 2046
+                    nationality:
+                      type: string
+                      example: "Australian"
+        '404':
+          description: Book with specified ISBN does not exist
+  /books/{isbn}/orders:
+    get:
+      summary: Gets a list of all the orders containing the book with specified ISBN
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object representing all the orders containing the book
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      example: 1269.22
+                    datetime:
+                      type: string
+                      example: "2022-04-27T18:25:43"
+                    customerName:
+                      type: string
+                      example: "Audrey"
+        '404':
+          description: Book with specified ISBN does not exist
+  /orders:
+    get:
+      summary: Returns a list of orders
+      responses:
+        '200':
+          description: A JSON array of every order in the system
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      example: 39369.22
+                    datetime:
+                      type: string
+                      example: "2032-03-21T08:03:54"
+                    customerName:
+                      type: string
+                      example: "Reanna"
+                    books:
+                      type: array
+                      items:
+                        type: object
+        '204':
+          description: No orders, array is empty
+    post:
+      summary: Creates a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  example: 59269.30
+                datetime:
+                  type: string
+                  example: "2040-12-04T02:23:33"
+                customerName:
+                  type: string
+                  example: "April Rose"
+      responses:
+        '201':
+          description: Order succesfully created
+          headers:
+            Location:
+              description: Location of newly created order
+              schema:
+                type: string
+                format: url
+                example: "http://localhost:8080/api/orders/7"
+        '415':
+          description: Unsupported request body media type (JSON required)
+  /orders/{id}:
+    get:
+      summary: Returns an order by their ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+      responses:
+        '200':
+          description: A JSON object representing the order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    example: 28937.38
+                  datetime:
+                    type: string
+                    example: "2432-02-20T01:35:33"
+                  customerName:
+                    type: string
+                    example: "Claire Picoult"
+                  books:
+                    type: array
+                    items:
+                      type: object
+        '404':
+          description: Order with specified ID does not exist
+    delete:
+      summary: Deletes order with specified ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Order with specified ID was deleted
+        '404':
+          description: Order with specified ID does not exist
+    put:
+      summary: Updates specified order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datetime:
+                  type: string
+                  example: "2093-03-29T11:21:44"
+                customerName:
+                  type: string
+                  example: "Robert"
+      responses:
+        '200':
+          description: Order was updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    example: 9848.34
+                  datetime:
+                    type: string
+                    example: "2093-03-29T11:21:44"
+                  customerName:
+                    type: string
+                    example: "Robert"
+        '404':
+          description: Order with specified ID does not exist
+  /orders/{id}/books:
+    get:
+      summary: Returns a list of all books in the order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+      responses:
+        '200':
+          description: A JSON array of every book in the order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    isbn:
+                      type: string
+                      example: "SD239"
+                    title:
+                      type: string
+                      example: "Think like a Boss"
+                    publicationYear:
+                      type: integer
+                      format: int64
+                      example: 2009
+                    price:
+                      type: number
+                      example: 17.99
+        '404':
+          description: Order with specified ID does not exist
+    post:
+      summary: Creates a new book and adds it to the specified order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isbn:
+                  type: string
+                  example: "AK1928"
+                title:
+                  type: string
+                  example: "The Boy In Striped Pajamas"
+                publicationYear:
+                  type: integer
+                  format: int64
+                  example: 2022
+                price:
+                  type: number
+                  example: 44.49
+      responses:
+        '200':
+          description: Book was created and added to order successfully
+          headers:
+            Location:
+              description: Location of newly created book
+              schema:
+                type: string
+                format: url
+                example: "http://localhost:8080/api/books/AK1928"
+        '415':
+          description: Unsupported request body media type (JSON required)
+        '409':
+          description: A book with the supplied ISBN already exists
+  /orders/{id}/books/{isbn}:
+    delete:
+      summary: Removes a book with the specified ISBN from the specified order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of target order
+          schema:
+            type: number
+        - in: path
+          name: isbn
+          required: true
+          description: ISBN of target book
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book with specified ISBN was deleted
+        '404':
+          description: Book with specified ISBN does not exist
